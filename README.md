@@ -10,10 +10,5 @@ Data:
 
 * [NHANES Ferritin data (2017-2018)](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/FERTIN_J.htm)
 
-
-* [NHANES Demographic data (2015-2016)](https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.htm)
-
-* [NHANES Ferritin data (2015-2016)](https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/FERTIN_I.htm)
-
 ### Analysis Proposal 
 I would like to use R and run a t-test on the difference between men and women to determine if there is a statistically significant iron deficiency, and based on if my results is statistically significant, I will run a regression model with the different races as predictors. If my results are not statistically significant between men and women, I will run a regression on my entire data set. 
