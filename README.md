@@ -12,3 +12,7 @@ Data:
 
 ### Analysis Proposal 
 I would like to use R and run a t-test on the difference between men and women to determine if there is a statistically significant iron deficiency, and based on if my results is statistically significant, I will run a regression model with the different races as predictors. If my results are not statistically significant between men and women, I will run a regression on my entire data set. 
+
+### Draft 
+* [Final Draft](https://github.com/rurithu/stats506_final/blob/main/Final_Draft.Rmd) 
+  + Using a survey design to find proportions of iron deficiencies by Race and Gender
