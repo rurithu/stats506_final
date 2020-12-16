@@ -1,0 +1,94 @@
+---
+title: "Can Iron Deficiency be explained by Race and Gender?"
+author: "Rithu Uppalapati"
+date: "12/15/2020"
+output: html_document
+---
+
+###  Introduction
+
+
+
+I am very iron deficient, and honestly it plagues my existence, so I wanted to determine if there were some predictors that could explain why I have such low iron levels:
+  *Is gender a good predictor to determine Iron Deficiency, and does the prediction power differ by race?*
+
+I am using ferritin levels to determine whether or not a person is iron deficient. Ferritin is a blood protein that stores iron, and low ferritin levels are indicative that the body is not getting enough iron. According to [studies conducted by Mayo Clinic](https://www.mayoclinic.org/tests-procedures/ferritin-test/about/pac-20384928) the normal levels of ferritin in Men are 24 - 336 micrograms per liter and normal levels in women are 11 - 307 micrograms per liter, and anything less than the minimum value is considered iron deficient.
+
+Women on average need less iron levels in their body, but because of menstrual cycles, pregnancy etc., women are more likely to lose iron that is stored in the blood. I have seen this phenomenon in my everyday life, where women are affected more by iron deficiency. I consider race in my study as well because factors such as diet and genes can vary by race and these factors can be important in determining whether or not a person is iron deficient. 
+
+Age and diet could also affect iron levels in the body, I found that [obestity](https://pubmed.ncbi.nlm.nih.gov/21462109/) can actually increase the risk of iron deficiency because of poor dietary intake and also an increased need for iron, so it is important to control for amount of total fat intake. I use the `survey` package in order to account for weights to perform multiple logistic regressions to determine the prediction power of gender and race on the probability that a person is iron deficient. I chose logistic regression because my response variable has a binary structure. 
+
+### Data/Methods 
+
+
+
+For my analysis I used the `survey` and `srvyr` packages. I used `ggplot2` and `kableExtra` to visualize my results. 
+
+For my data, I used [NHANES 2017-2018 Demographic Data](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.htm), [NHANES 2017-2018 Ferritin Data](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/FERTIN_J.htm), and [NHANES 2017-2018 Dietary Intake Data](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DR1TOT_J.htm)
+
+I wanted to focus on the prediction power of Race and Gender, so I controlled for variables that I thought could affect the data like total fat intake and age. 
+
+|Variables    | 
+|----------   |------------------------|
+|`SEQN`     | Unique Identifier        |
+|`RIDAGEYR` | Age                      |
+|`RIAGENDR` | Gender                   |
+|`RIDRETH3` | Race                     |
+|`LBDFERSI` | Ferritin Levels (ug/L)   |
+|`SDMVPSU`  | Survey ID                |
+|`SDMVSTRA` | Survey Strata            |
+|`WTINT2YR` | Survey Weights           |
+|`DR1TTFAT` | Total Fat Intake (gm)    |
+
+My first step was to clean up my [data](https://github.com/rurithu/stats506_final/blob/main/Stats_Final/data_prep.R) to make it easier for me to visualize
+
+Then in my [analysis file](https://github.com/rurithu/stats506_final/blob/main/Stats_Final/logitreg.R) I created a new column `low_iron` with binary responses, for iron deficiency. If men had ferritin levels <24, and women have ferritin levels <11, they were coded into a dummy variable `low_iron == 1` if not they were coded into `low_iron == 0`. 
+
+My next step was to visualize my results, so I used `srvyr` to create a survey object, and used the psuedo-`dplyr` functions in order to find the average ferritin levels grouped by race, and age. Also, before I visualized my results I wanted to determine the proportions by race and gender of who was iron deficient. Both of the summary statistics were computed with 95% confidence intervals as shown in my file. For this I used the `survey` package to create a new survey design with the survey ID's included and used the `svyby` function. The results from my visualization were pretty promising in agreeing with my hypothesis, so my final step was to run a few logistic regression models. 
+
+I ran three models using the `survey` package with the `svyglm` function:
+* The first model I wanted to determine the predictive power of gender. So, I ran a logistic regression with `RIAGENDR`, and my two control variables `DR1TTFAT` and `RIDAGEYR` on my response variable `low_iron`
+* The second model, I introduced `RIDRETH3` and used `RIAGENDR` as a control along with the other control variables from model 1
+* The final model had everything the second model had, and I included a `RIAGENDR` * `RIDRETH3` interaction term to see if gender would affect races differently.
+
+I compared the models by looking at the coefficient estimates from the regression, and determining whether or not my explanatory variables of interest had a significant prediction response for my response variable.
+
+
+
+### Results 
+
+![Figure 1](/Users/rithuuppalapati/Desktop/stats506/Final_Project/final_plot.png)
+
+
+
+Since the confidence bars don't overlap we can see that the average ferritin levels in women are on average much lower than men. We can also see that the disparity if ferritin levels between men and women of the same race is greatest in the Asian race, where the mean ferritin level in Asian men is more than double that of Asian women. The lowest average iron deficiency is seen in women of hispanic origin. This graph doesn't tell us about iron deficiency, rather it shows us how ferritin levels are distributed between gender and race, and can give us insight into the disparity between the effect of iron deficiency on men and women.
+
+![Table 1a.](/Users/rithuuppalapati/Desktop/stats506/Final_Project/Rplot04.png)
+
+
+
+Compared to men, women are not only more likely to have lower ferritin levels, but also they are more likely to be iron deficient. This table is a proportion of demographics of people who are and aren't iron deficient. We can see that around 12% of the people who are iron deficient are actually Asian Women. Across the entire table women have higher proportions of iron deficiency than men.
+
+![Table 1b.](/Users/rithuuppalapati/Desktop/stats506/Final_Project/Rplot03.png)
+
+
+
+The only statistically significant predictors are actually age, and the intercept. All the other predictors have pretty large p-values. We can see that the coefficient estimate for the Male predictor is negative, meaning that if the subject is male it decreases the response of a success, but we can't tell how much this actually impacts the prediction because the p-value is around 40%. From our two results table from above we can see that an Asian Man also decreases the odds-ratio response of a success by more than just using male as a predictor, and the p-value is lower at 19%; however, the p-value is still to high to reject out null hypothesis, and say that this interaction between Male and Asian is a strong predictor. 
+
+### Conculsion 
+
+
+
+Although there is some evidence that agrees with the fact that race and gender is correlated with iron deficiency, we cannot say forsure whether they are good measures to predict it. Maybe if the NHANES Data had other measures or iron levels such as iron absorption rate, or hemoglobin loss etc., and we took all of those into account in the regression the results of gender and race would be significant. I also believe that the sample size should have been larger, because even though iron deficiency seems to be more prevalent in women of color, it is still not that prevalent in the general population 
+
+### References 
+
+Cepeda-Lopez, Ana C., et al. “Does Obesity Increase Risk for Iron Deficiency? A Review of the Literature and the 
+   Potential Mechanisms.” International Journal for Vitamin and Nutrition Research, vol. 80, no. 45, 2010, pp. 263–270.,    doi:10.1024/0300-9831/a000033. 
+
+Mayo Clinic. “Ferritin Test.” Mayo Clinic, Mayo Foundation for Medical Education and Research, 28 Nov. 2019,
+   www.mayoclinic.org/tests-procedures/ferritin-test/about/pac-20384928. 
+   
+
+   
+
